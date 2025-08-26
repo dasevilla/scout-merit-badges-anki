@@ -1,0 +1,99 @@
+[project]
+name = "scout-merit-badges-anki"
+version = "0.1.0"
+description = "Generates an Anki deck for learning Scouting America merit badges by image"
+readme = "README.md"
+authors = [{name = "Devin Sevilla"}]
+license = "Apache-2.0"
+requires-python = ">=3.11"
+classifiers = []
+dependencies = [
+    "click>=8.1",
+    "genanki>=0.13.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/dasevilla/scout-merit-badges-anki"
+Changelog = "https://github.com/dasevilla/scout-merit-badges-anki/releases"
+Issues = "https://github.com/dasevilla/scout-merit-badges-anki/issues"
+CI = "https://github.com/dasevilla/scout-merit-badges-anki/actions"
+
+[project.scripts]
+scout-merit-badges-anki = "scout_merit_badges_anki.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pre-commit>=4.3.0",
+    "pytest>=7.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.6.0",
+    "hypothesis>=6.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes (includes syntax errors, unused imports, etc.)
+    "I",    # isort
+    "UP",   # pyupgrade (includes builtin literals UP018)
+    "B",    # flake8-bugbear
+    "RUF",  # ruff-specific rules
+    "T20",  # flake8-print (catches debug print statements)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=scout_merit_badges_anki",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml",
+]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["scout_merit_badges_anki"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/.*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = false
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"

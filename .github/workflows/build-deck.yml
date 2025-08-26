@@ -1,0 +1,94 @@
+name: Build and Release Deck
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Release name (leave empty for auto-generated)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-deck:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        python-version: "3.12"
+        enable-cache: true
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Build Anki deck
+      run: make fetch-and-build
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get deck info
+      id: deck-info
+      run: |
+        DECK_FILE=$(ls *.apkg | head -1)
+        echo "deck-file=$DECK_FILE" >> $GITHUB_OUTPUT
+
+        DECK_SIZE=$(du -h "$DECK_FILE" | cut -f1)
+        echo "deck-size=$DECK_SIZE" >> $GITHUB_OUTPUT
+
+        SCOUT_TAG=$(gh release list --repo dasevilla/scout-archive --limit 1 --json tagName --jq '.[0].tagName')
+        echo "scout-tag=$SCOUT_TAG" >> $GITHUB_OUTPUT
+
+        DATE=$(date +%Y-%m-%d)
+        RELEASE_TAG="deck-$DATE-$GITHUB_RUN_NUMBER-$GITHUB_RUN_ATTEMPT"
+        echo "release-tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
+
+        if [ -n "${{ inputs.release_name }}" ]; then
+          RELEASE_NAME="${{ inputs.release_name }}"
+        else
+          if [ "$GITHUB_RUN_ATTEMPT" = "1" ]; then
+            RELEASE_NAME="Merit Badge Deck - $DATE (Build $GITHUB_RUN_NUMBER)"
+          else
+            RELEASE_NAME="Merit Badge Deck - $DATE (Build $GITHUB_RUN_NUMBER, Attempt $GITHUB_RUN_ATTEMPT)"
+          fi
+        fi
+        echo "release-name=$RELEASE_NAME" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.deck-info.outputs.release-tag }}
+        name: ${{ steps.deck-info.outputs.release-name }}
+        body: |
+          ## Merit Badge Anki Deck
+
+          This release contains an Anki deck for learning Scouting America merit badges by image.
+
+          ### Details
+          - **Deck file**: `${{ steps.deck-info.outputs.deck-file }}`
+          - **File size**: ${{ steps.deck-info.outputs.deck-size }}
+          - **Source data**: [scout-archive/${{ steps.deck-info.outputs.scout-tag }}](https://github.com/dasevilla/scout-archive/releases/tag/${{ steps.deck-info.outputs.scout-tag }})
+          - **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ### How to Use
+          1. Download the `.apkg` file below
+          2. Open Anki on your device
+          3. Go to File → Import
+          4. Select the downloaded `.apkg` file
+          5. The deck will be imported and ready to study!
+
+          ### What's Included
+          - Merit badge images on the front of cards
+          - Badge names and descriptions on the back
+          - Stable card IDs to prevent duplicates when reimporting
+
+          Generated automatically from the [scout-merit-badges-anki](https://github.com/dasevilla/scout-merit-badges-anki) project.
+        files: |
+          *.apkg
+        draft: false
+        prerelease: false
