@@ -1,12 +1,19 @@
 name: Build and Release Deck
 
 on:
+  schedule:
+    - cron: '0 10 * * 0'  # Sundays at 10 AM UTC (1 hour after scout-archive)
   workflow_dispatch:
     inputs:
       release_name:
         description: 'Release name (leave empty for auto-generated)'
         required: false
         type: string
+      force_build:
+        description: 'Force build even if no new scout-archive release'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,24 +22,61 @@ jobs:
   build-deck:
     runs-on: ubuntu-latest
     steps:
+    - name: Check for new scout-archive release
+      id: check-release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [[ "${{ inputs.force_build }}" == "true" ]]; then
+          echo "should-build=true" >> $GITHUB_OUTPUT
+          echo "Force build requested - skipping release check"
+          exit 0
+        fi
+
+        # Get latest scout-archive release date
+        SCOUT_DATE=$(gh release list --repo dasevilla/scout-archive --limit 1 --json publishedAt --jq '.[0].publishedAt' 2>/dev/null)
+        if [[ -z "$SCOUT_DATE" ]]; then
+          echo "::error::No scout-archive releases found"
+          exit 1
+        fi
+
+        # Get our latest deck release date (if any)
+        DECK_DATE=$(gh release list --limit 1 --json publishedAt --jq '.[0].publishedAt' 2>/dev/null || echo "1970-01-01T00:00:00Z")
+
+        echo "Scout archive latest: $SCOUT_DATE"
+        echo "Deck latest: $DECK_DATE"
+
+        if [[ "$SCOUT_DATE" > "$DECK_DATE" ]]; then
+          echo "should-build=true" >> $GITHUB_OUTPUT
+          echo "✅ New scout-archive release found - building deck"
+        else
+          echo "should-build=false" >> $GITHUB_OUTPUT
+          echo "⏭️ No new scout-archive release - skipping build"
+        fi
+
     - name: Checkout repository
+      if: steps.check-release.outputs.should-build == 'true'
       uses: actions/checkout@v4
 
     - name: Install uv
+      if: steps.check-release.outputs.should-build == 'true'
       uses: astral-sh/setup-uv@v6
       with:
         python-version: "3.12"
         enable-cache: true
 
     - name: Install dependencies
+      if: steps.check-release.outputs.should-build == 'true'
       run: uv sync
 
     - name: Build Anki deck
+      if: steps.check-release.outputs.should-build == 'true'
       run: make fetch-and-build
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get deck info
+      if: steps.check-release.outputs.should-build == 'true'
       id: deck-info
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,12 +109,14 @@ jobs:
         echo "release-name=$RELEASE_NAME" >> $GITHUB_OUTPUT
 
     - name: Upload deck artifact
+      if: steps.check-release.outputs.should-build == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: anki-deck
         path: "*.apkg"
 
     - name: Create Release
+      if: steps.check-release.outputs.should-build == 'true'
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.deck-info.outputs.release-tag }}
