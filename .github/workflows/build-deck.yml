@@ -41,7 +41,7 @@ jobs:
         fi
 
         # Get our latest deck release date (if any)
-        DECK_DATE=$(gh release list --limit 1 --json publishedAt --jq '.[0].publishedAt' 2>/dev/null || echo "1970-01-01T00:00:00Z")
+        DECK_DATE=$(gh release list --repo ${{ github.repository }} --limit 1 --json publishedAt --jq '.[0].publishedAt' 2>/dev/null || echo "1970-01-01T00:00:00Z")
 
         echo "Scout archive latest: $SCOUT_DATE"
         echo "Deck latest: $DECK_DATE"
