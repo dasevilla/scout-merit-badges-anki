@@ -50,6 +50,9 @@ jobs:
         RELEASE_TAG="deck-$DATE-$GITHUB_RUN_NUMBER-$GITHUB_RUN_ATTEMPT"
         echo "release-tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
 
+        GENERATED_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        echo "generated-date=$GENERATED_DATE" >> $GITHUB_OUTPUT
+
         if [ -n "${{ inputs.release_name }}" ]; then
           RELEASE_NAME="${{ inputs.release_name }}"
         else
@@ -75,7 +78,7 @@ jobs:
           - **Deck file**: `${{ steps.deck-info.outputs.deck-file }}`
           - **File size**: ${{ steps.deck-info.outputs.deck-size }}
           - **Source data**: [scout-archive/${{ steps.deck-info.outputs.scout-tag }}](https://github.com/dasevilla/scout-archive/releases/tag/${{ steps.deck-info.outputs.scout-tag }})
-          - **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Generated**: ${{ steps.deck-info.outputs.generated-date }}
 
           ### How to Use
           1. Download the `.apkg` file below
