@@ -6,9 +6,10 @@ from typing import Any
 
 import click
 
-from .. import deck, schema
+from .. import deck
+from ..log import get_logger
 from ..processor import DeckProcessor
-from . import mapping
+from .schema import normalize_badge_data
 
 
 class MeritBadgeProcessor(DeckProcessor):
@@ -42,7 +43,7 @@ class MeritBadgeProcessor(DeckProcessor):
                 all_badge_data.append(data)
 
         # Normalize all badge data
-        badges = schema.normalize_badge_data(all_badge_data)
+        badges = normalize_badge_data(all_badge_data)
 
         # Find image files
         available_images = {}
@@ -58,7 +59,27 @@ class MeritBadgeProcessor(DeckProcessor):
         self, content: list[Any], images: dict[str, Any]
     ) -> tuple[list[tuple[Any, str]], list[Any]]:
         """Map badges to images."""
-        return mapping.map_badges_to_images(content, images)
+        logger = get_logger()
+        mapped_badges = []
+        unmapped_badges = []
+
+        for badge in content:
+            # Use the image_filename field directly
+            image_name = None
+            if hasattr(badge, "image_filename") and badge.image_filename:
+                if badge.image_filename in images:
+                    image_name = badge.image_filename
+
+            if image_name:
+                mapped_badges.append((badge, image_name))
+            else:
+                unmapped_badges.append(badge)
+
+        logger.info(
+            f"Mapped {len(mapped_badges)} badges to images, "
+            f"{len(unmapped_badges)} badges without images"
+        )
+        return mapped_badges, unmapped_badges
 
     def create_mapping_summary(
         self,
@@ -68,7 +89,23 @@ class MeritBadgeProcessor(DeckProcessor):
         unmapped: list[Any],
     ) -> dict[str, Any]:
         """Create mapping summary for badges."""
-        return mapping.create_mapping_summary(content, images, mapped, unmapped)
+        mapped_image_names = {img_name for _, img_name in mapped}
+        unused_images = set(images.keys()) - mapped_image_names
+
+        # Create missing image details
+        missing_images = []
+        for badge in unmapped:
+            expected = getattr(badge, "image_filename", "unknown")
+            missing_images.append({"badge_name": badge.name, "expected_image": expected})
+
+        return {
+            "total_badges": len(content),
+            "total_images": len(images),
+            "mapped_badges": len(mapped),
+            "unmapped_badges": len(unmapped),
+            "unused_images": len(unused_images),
+            "missing_image_details": missing_images,
+        }
 
     def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
         """Print merit badge summary."""

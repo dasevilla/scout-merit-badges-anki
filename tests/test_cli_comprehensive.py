@@ -15,7 +15,9 @@ def test_build_with_valid_directory():
         with patch(
             "scout_anki.merit_badges.processor.MeritBadgeProcessor.process_directory"
         ) as mock_process:
-            with patch("scout_anki.merit_badges.mapping.map_badges_to_images") as mock_map:
+            with patch(
+                "scout_anki.merit_badges.processor.MeritBadgeProcessor.map_content_to_images"
+            ) as mock_map:
                 with patch("scout_anki.deck.create_merit_badge_deck") as mock_deck:
                     # Setup mocks
                     mock_process.return_value = (["badge"], {"test.jpg": Path("test.jpg")})

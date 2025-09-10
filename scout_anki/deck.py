@@ -6,9 +6,10 @@ from pathlib import Path
 
 import genanki
 
-from .cub_adventures.adventure import Adventure
+from .cub_adventures.schema import Adventure
 from .log import get_logger
-from .schema import Badge, slug, stable_id
+from .merit_badges.schema import Badge
+from .schema import slug, stable_id
 
 
 def create_merit_badge_model(model_name: str) -> genanki.Model:

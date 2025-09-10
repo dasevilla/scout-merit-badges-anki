@@ -5,8 +5,9 @@ from typing import Any
 import click
 
 from .. import deck
+from ..log import get_logger
 from ..processor import DeckProcessor
-from . import adventure, mapping
+from .schema import process_adventure_directory
 
 
 class AdventureProcessor(DeckProcessor):
@@ -25,13 +26,33 @@ class AdventureProcessor(DeckProcessor):
 
     def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
         """Process directory for adventures."""
-        return adventure.process_adventure_directory(directory_path)
+        return process_adventure_directory(directory_path)
 
     def map_content_to_images(
         self, content: list[Any], images: dict[str, Any]
     ) -> tuple[list[tuple[Any, str]], list[Any]]:
         """Map adventures to images."""
-        return mapping.map_adventures_to_images(content, images)
+        logger = get_logger()
+        mapped_adventures = []
+        unmapped_adventures = []
+
+        for adventure in content:
+            # Use the image_filename field directly
+            image_name = None
+            if hasattr(adventure, "image_filename") and adventure.image_filename:
+                if adventure.image_filename in images:
+                    image_name = adventure.image_filename
+
+            if image_name:
+                mapped_adventures.append((adventure, image_name))
+            else:
+                unmapped_adventures.append(adventure)
+
+        logger.info(
+            f"Mapped {len(mapped_adventures)} adventures to images, "
+            f"{len(unmapped_adventures)} adventures without images"
+        )
+        return mapped_adventures, unmapped_adventures
 
     def create_mapping_summary(
         self,
@@ -41,7 +62,27 @@ class AdventureProcessor(DeckProcessor):
         unmapped: list[Any],
     ) -> dict[str, Any]:
         """Create mapping summary for adventures."""
-        return mapping.create_adventure_mapping_summary(content, images, mapped, unmapped)
+        used_images = {image_name for _, image_name in mapped}
+        unused_images = set(images.keys()) - used_images
+
+        missing_image_details = []
+        for adventure in unmapped:
+            expected = getattr(adventure, "image_filename", f"{adventure.slug}.jpg")
+            missing_image_details.append(
+                {
+                    "adventure_name": f"{adventure.name} ({adventure.rank})",
+                    "expected_image": expected,
+                }
+            )
+
+        return {
+            "total_adventures": len(content),
+            "total_images": len(images),
+            "mapped_adventures": len(mapped),
+            "unmapped_adventures": len(unmapped),
+            "unused_images": len(unused_images),
+            "missing_image_details": missing_image_details,
+        }
 
     def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
         """Print adventure summary."""
