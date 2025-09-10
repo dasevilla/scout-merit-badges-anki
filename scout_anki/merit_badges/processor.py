@@ -1,12 +1,14 @@
 """Merit badge processor."""
 
+import json
+from pathlib import Path
 from typing import Any
 
 import click
 
-from .. import deck
+from .. import deck, schema
 from ..processor import DeckProcessor
-from . import data, mapping
+from . import mapping
 
 
 class MeritBadgeProcessor(DeckProcessor):
@@ -18,14 +20,39 @@ class MeritBadgeProcessor(DeckProcessor):
     def get_defaults(self) -> dict[str, str]:
         """Get default values for merit badges."""
         return {
-            "out": "merit_badge_image_trainer.apkg",
-            "deck_name": "Merit Badge Image Trainer",
+            "out": "merit_badges.apkg",
+            "deck_name": "Merit Badges",
             "model_name": "Merit Badge Quiz",
         }
 
     def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
-        """Process directory for merit badges."""
-        return data.process_directory(directory_path)
+        """Process directory to find badges and images."""
+        directory = Path(directory_path)
+
+        # Find and process JSON files
+        all_badge_data = []
+        for json_file in directory.glob("**/*.json"):
+            with open(json_file, encoding="utf-8") as f:
+                data = json.load(f)
+
+            # Handle both single objects and arrays
+            if isinstance(data, list):
+                all_badge_data.extend(data)
+            else:
+                all_badge_data.append(data)
+
+        # Normalize all badge data
+        badges = schema.normalize_badge_data(all_badge_data)
+
+        # Find image files
+        available_images = {}
+        image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+        for img_file in directory.glob("**/*"):
+            if img_file.is_file() and img_file.suffix.lower() in image_extensions:
+                available_images[img_file.name] = img_file
+
+        return badges, available_images
 
     def map_content_to_images(
         self, content: list[Any], images: dict[str, Any]

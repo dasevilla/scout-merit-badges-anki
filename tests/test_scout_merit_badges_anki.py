@@ -4,7 +4,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from scout_anki.merit_badges import data
+from scout_anki.merit_badges.processor import MeritBadgeProcessor
 
 
 def test_directory_processing():
@@ -25,7 +25,8 @@ def test_directory_processing():
         (test_dir / "camping.png").write_bytes(b"fake camping image")
 
         # Process directory
-        badges, images = data.process_directory(test_dir)
+        processor = MeritBadgeProcessor()
+        badges, images = processor.process_directory(test_dir)
 
         assert len(badges) == 2
         assert len(images) == 2
@@ -34,9 +35,10 @@ def test_directory_processing():
 
 
 def test_empty_directory():
-    """Test processing empty directory."""
+    """Test processing an empty directory."""
     with tempfile.TemporaryDirectory() as temp_dir:
-        badges, images = data.process_directory(temp_dir)
+        processor = MeritBadgeProcessor()
+        badges, images = processor.process_directory(temp_dir)
 
         assert len(badges) == 0
         assert len(images) == 0

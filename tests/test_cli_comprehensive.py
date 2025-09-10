@@ -12,7 +12,9 @@ from scout_anki.cli import build
 def test_build_with_valid_directory():
     """Test build command with valid directory."""
     with tempfile.TemporaryDirectory() as temp_dir:
-        with patch("scout_anki.merit_badges.data.process_directory") as mock_process:
+        with patch(
+            "scout_anki.merit_badges.processor.MeritBadgeProcessor.process_directory"
+        ) as mock_process:
             with patch("scout_anki.merit_badges.mapping.map_badges_to_images") as mock_map:
                 with patch("scout_anki.deck.create_merit_badge_deck") as mock_deck:
                     # Setup mocks
@@ -29,7 +31,9 @@ def test_build_with_valid_directory():
 def test_build_no_badges_found():
     """Test build command when no badges are found."""
     with tempfile.TemporaryDirectory() as temp_dir:
-        with patch("scout_anki.merit_badges.data.process_directory") as mock_process:
+        with patch(
+            "scout_anki.merit_badges.processor.MeritBadgeProcessor.process_directory"
+        ) as mock_process:
             mock_process.return_value = ([], {})
 
             runner = CliRunner()
