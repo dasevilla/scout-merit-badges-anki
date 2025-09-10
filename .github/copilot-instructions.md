@@ -1,8 +1,8 @@
-# Copilot Instructions for scout-merit-badges-anki
+# Copilot Instructions for scout-anki
 
 ## Repository Overview
 
-This is a Python CLI tool that generates Anki flashcard decks (.apkg files) for learning Scouting America merit badges by image. The tool processes local archive files (.zip, .tar.gz) containing merit badge data and images, maps badges to their corresponding images using sophisticated pattern matching, and creates structured Anki decks with stable IDs to prevent duplicates on reimport.
+This is a Python CLI tool that generates Anki flashcard decks (.apkg files) for Scouting content. Currently supports learning Scouting America merit badges by image. The tool processes local archive files (.zip, .tar.gz) containing merit badge data and images, maps badges to their corresponding images using sophisticated pattern matching, and creates structured Anki decks with stable IDs to prevent duplicates on reimport.
 
 **Repository Stats:**
 - Language: Python 3.11+ (currently using 3.12)
@@ -59,7 +59,7 @@ make cov-report
 uv run pytest --cov-report=html && open htmlcov/index.html
 
 # Run CLI tool for testing
-uv run scout-merit-badges-anki --help
+uv run scout-anki --help
 ```
 
 ### Pre-commit Hooks (MANDATORY)
@@ -79,7 +79,7 @@ uv run pre-commit run --all-files
 ### Validation Commands
 ```bash
 # Test CLI functionality (dry run - safe to run)
-uv run scout-merit-badges-anki build --dry-run --quiet *.zip *.tar.gz
+uv run scout-anki build --dry-run --quiet *.zip *.tar.gz
 
 # Download and test with latest release
 make fetch-and-build
@@ -115,7 +115,7 @@ make clean  # Removes build artifacts, .venv, __pycache__, *.apkg files, coverag
 tests/
 ├── test_cli_simple.py             # Basic CLI tests (4 tests)
 ├── test_cli_comprehensive.py      # CLI functionality with mocking (2 tests)
-└── test_scout_merit_badges_anki.py # Directory processing integration (2 tests)
+└── test_scout_anki.py # Directory processing integration (2 tests)
 ```
 
 ### Coverage by Module
@@ -152,7 +152,7 @@ When adding new functionality:
 
 ## Project Architecture
 
-### Core Modules (`scout_merit_badges_anki/`)
+### Core Modules (`scout_anki/`)
 - `cli.py` - Click-based command line interface with build command
 - `archive.py` - Archive processing (ZIP/TAR.GZ) and file extraction
 - `mapping.py` - Sophisticated image-to-badge mapping logic with pattern matching
@@ -213,7 +213,7 @@ Uses deterministic hashing in `schema.py` to generate stable Anki model/deck IDs
 ```bash
 # 1. Clone repository
 git clone <repo-url>
-cd scout-merit-badges-anki
+cd scout-anki
 
 # 2. Set up environment (REQUIRED)
 uv sync
@@ -243,7 +243,7 @@ git commit -m "Your commit message"
 ### Testing Changes
 ```bash
 # Test CLI functionality without creating files
-uv run scout-merit-badges-anki build --dry-run *.zip *.tar.gz
+uv run scout-anki build --dry-run *.zip *.tar.gz
 
 # Download and test with latest release
 make fetch-and-build
@@ -295,11 +295,11 @@ make test
 ## File Structure Reference
 
 ```
-scout-merit-badges-anki/
+scout-anki/
 ├── .github/
 │   ├── copilot-instructions.md  # This file - development guidelines
 │   └── workflows/               # CI/CD pipelines
-├── scout_merit_badges_anki/     # Main package
+├── scout_anki/     # Main package
 │   ├── __init__.py             # Package metadata
 │   ├── __main__.py             # Entry point for python -m
 │   ├── cli.py                  # Command line interface

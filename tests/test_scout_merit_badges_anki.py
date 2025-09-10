@@ -4,7 +4,7 @@ import json
 import tempfile
 from pathlib import Path
 
-from scout_merit_badges_anki import directory
+from scout_anki import directory
 
 
 def test_directory_processing():

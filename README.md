@@ -1,6 +1,6 @@
-# scout-merit-badges-anki
+# scout-anki
 
-Generates an Anki deck for learning Scouting America merit badges by sight. The front of the card is an image of the merit badge. The back of the card is the name, description, and an indicator if it is required for the Eagle rank.
+Anki deck builder for Scouting content. Generates Anki decks for learning Scouting America merit badges by sight. The front of the card is an image of the merit badge. The back of the card is the name, description, and an indicator if it is required for the Eagle rank.
 
 ## Usage
 
@@ -27,20 +27,20 @@ for file in *.zip; do unzip -q "$file" -d extracted/; done
 for file in *.tar.gz; do tar -xzf "$file" -C extracted/; done
 
 # Generate Anki deck from extracted directory
-scout-merit-badges-anki build extracted/
+scout-anki build extracted/
 ```
 
 ### Advanced Usage
 
 ```bash
 # Custom output file
-scout-merit-badges-anki build extracted/ --out my_badges.apkg
+scout-anki build extracted/ --out my_badges.apkg
 
 # Dry run to preview without creating file
-scout-merit-badges-anki build extracted/ --dry-run
+scout-anki build extracted/ --dry-run
 
 # Custom deck and model names
-scout-merit-badges-anki build extracted/ --deck-name "My Badges" --model-name "Badge Quiz"
+scout-anki build extracted/ --deck-name "My Badges" --model-name "Badge Quiz"
 ```
 
 ### Command Reference
@@ -48,7 +48,7 @@ scout-merit-badges-anki build extracted/ --deck-name "My Badges" --model-name "B
 #### `build` - Generate Anki deck
 
 ```bash
-scout-merit-badges-anki build [DIRECTORY] [OPTIONS]
+scout-anki build [DIRECTORY] [OPTIONS]
 ```
 
 **Arguments:**
@@ -89,7 +89,7 @@ The tool uses a sophisticated strategy to match badges with images:
 To contribute to this tool, first checkout the code. Then set up the development environment:
 
 ```bash
-cd scout-merit-badges-anki
+cd scout-anki
 uv sync
 ```
 

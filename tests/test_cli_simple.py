@@ -2,7 +2,7 @@
 
 from click.testing import CliRunner
 
-from scout_merit_badges_anki.cli import build, cli
+from scout_anki.cli import build, cli
 
 
 class TestCLIBasic:

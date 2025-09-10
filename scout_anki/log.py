@@ -34,7 +34,7 @@ def setup_logging(quiet: bool = False, verbose: int = 0) -> logging.Logger:
     Returns:
         Configured logger
     """
-    logger = logging.getLogger("scout_merit_badges_anki")
+    logger = logging.getLogger("scout_anki")
 
     # Clear any existing handlers
     logger.handlers.clear()
@@ -69,4 +69,4 @@ def setup_logging(quiet: bool = False, verbose: int = 0) -> logging.Logger:
 
 def get_logger() -> logging.Logger:
     """Get the configured logger."""
-    return logging.getLogger("scout_merit_badges_anki")
+    return logging.getLogger("scout_anki")

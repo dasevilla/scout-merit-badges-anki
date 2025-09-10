@@ -1,7 +1,7 @@
 [project]
-name = "scout-merit-badges-anki"
+name = "scout-anki"
 version = "0.1.0"
-description = "Generates an Anki deck for learning Scouting America merit badges by image"
+description = "Anki deck builder for Scouting content"
 readme = "README.md"
 authors = [{name = "Devin Sevilla"}]
 license = "Apache-2.0"
@@ -13,13 +13,13 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dasevilla/scout-merit-badges-anki"
-Changelog = "https://github.com/dasevilla/scout-merit-badges-anki/releases"
-Issues = "https://github.com/dasevilla/scout-merit-badges-anki/issues"
-CI = "https://github.com/dasevilla/scout-merit-badges-anki/actions"
+Homepage = "https://github.com/dasevilla/scout-anki"
+Changelog = "https://github.com/dasevilla/scout-anki/releases"
+Issues = "https://github.com/dasevilla/scout-anki/issues"
+CI = "https://github.com/dasevilla/scout-anki/actions"
 
 [project.scripts]
-scout-merit-badges-anki = "scout_merit_badges_anki.cli:cli"
+scout-anki = "scout_anki.cli:cli"
 
 [build-system]
 requires = ["hatchling"]
@@ -58,7 +58,7 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=scout_merit_badges_anki",
+    "--cov=scout_anki",
     "--cov-report=term-missing",
     "--cov-report=html:htmlcov",
     "--cov-report=xml",
@@ -70,7 +70,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["scout_merit_badges_anki"]
+source = ["scout_anki"]
 omit = [
     "*/tests/*",
     "*/test_*",
