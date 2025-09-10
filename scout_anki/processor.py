@@ -2,11 +2,21 @@
 
 import sys
 from abc import ABC, abstractmethod
-from typing import Any
+from pathlib import Path
+from typing import Protocol
+
+import genanki
 
 from . import deck
 from .errors import NoBadgesFoundError, NoImagesFoundError
 from .log import get_logger
+
+
+class ContentItem(Protocol):
+    """Protocol for content items (badges, adventures, etc.)."""
+
+    name: str
+    image_filename: str | None
 
 
 class DeckProcessor(ABC):
@@ -22,30 +32,30 @@ class DeckProcessor(ABC):
         pass
 
     @abstractmethod
-    def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
+    def process_directory(self, directory_path: str) -> tuple[list[ContentItem], dict[str, Path]]:
         """Process directory and return content and images."""
         pass
 
     @abstractmethod
     def map_content_to_images(
-        self, content: list[Any], images: dict[str, Any]
-    ) -> tuple[list[tuple[Any, str]], list[Any]]:
+        self, content: list[ContentItem], images: dict[str, Path]
+    ) -> tuple[list[tuple[ContentItem, str]], list[ContentItem]]:
         """Map content to images."""
         pass
 
     @abstractmethod
     def create_mapping_summary(
         self,
-        content: list[Any],
-        images: dict[str, Any],
-        mapped: list[tuple[Any, str]],
-        unmapped: list[Any],
-    ) -> dict[str, Any]:
+        content: list[ContentItem],
+        images: dict[str, Path],
+        mapped: list[tuple[ContentItem, str]],
+        unmapped: list[ContentItem],
+    ) -> dict[str, int | list[str]]:
         """Create mapping summary."""
         pass
 
     @abstractmethod
-    def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
+    def print_summary(self, summary: dict[str, int | list[str]], dry_run: bool) -> None:
         """Print build summary."""
         pass
 
@@ -54,9 +64,9 @@ class DeckProcessor(ABC):
         self,
         deck_name: str,
         model_name: str,
-        mapped_content: list[tuple[Any, str]],
-        images: dict[str, Any],
-    ) -> tuple[Any, list[str]]:
+        mapped_content: list[tuple[ContentItem, str]],
+        images: dict[str, Path],
+    ) -> tuple[genanki.Deck, list[str]]:
         """Create Anki deck."""
         pass
 

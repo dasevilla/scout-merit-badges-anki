@@ -1,14 +1,15 @@
 """Adventure processor."""
 
-from typing import Any
+from pathlib import Path
 
 import click
+import genanki
 
 from .. import deck
 from ..image_utils import map_content_by_image_filename
 from ..log import get_logger
 from ..processor import DeckProcessor
-from .schema import process_adventure_directory
+from .schema import Adventure, process_adventure_directory
 
 
 class AdventureProcessor(DeckProcessor):
@@ -25,13 +26,13 @@ class AdventureProcessor(DeckProcessor):
             "model_name": "Cub Scout Adventure Quiz",
         }
 
-    def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
+    def process_directory(self, directory_path: str) -> tuple[list[Adventure], dict[str, Path]]:
         """Process directory for adventures."""
         return process_adventure_directory(directory_path)
 
     def map_content_to_images(
-        self, content: list[Any], images: dict[str, Any]
-    ) -> tuple[list[tuple[Any, str]], list[Any]]:
+        self, content: list[Adventure], images: dict[str, Path]
+    ) -> tuple[list[tuple[Adventure, str]], list[Adventure]]:
         """Map adventures to images."""
         logger = get_logger()
         mapped_adventures, unmapped_adventures = map_content_by_image_filename(content, images)
@@ -44,11 +45,11 @@ class AdventureProcessor(DeckProcessor):
 
     def create_mapping_summary(
         self,
-        content: list[Any],
-        images: dict[str, Any],
-        mapped: list[tuple[Any, str]],
-        unmapped: list[Any],
-    ) -> dict[str, Any]:
+        content: list[Adventure],
+        images: dict[str, Path],
+        mapped: list[tuple[Adventure, str]],
+        unmapped: list[Adventure],
+    ) -> dict[str, int | list[str]]:
         """Create mapping summary for adventures."""
         used_images = {image_name for _, image_name in mapped}
         unused_images = set(images.keys()) - used_images
@@ -72,7 +73,7 @@ class AdventureProcessor(DeckProcessor):
             "missing_image_details": missing_image_details,
         }
 
-    def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
+    def print_summary(self, summary: dict[str, int | list[str]], dry_run: bool) -> None:
         """Print adventure summary."""
         click.echo("\n" + "=" * 60)
         click.echo("BUILD SUMMARY")
@@ -98,8 +99,8 @@ class AdventureProcessor(DeckProcessor):
         self,
         deck_name: str,
         model_name: str,
-        mapped_content: list[tuple[Any, str]],
-        images: dict[str, Any],
-    ) -> tuple[Any, list[str]]:
+        mapped_content: list[tuple[Adventure, str]],
+        images: dict[str, Path],
+    ) -> tuple[genanki.Deck, list[str]]:
         """Create adventure deck."""
         return deck.create_adventure_deck(deck_name, model_name, mapped_content, images)

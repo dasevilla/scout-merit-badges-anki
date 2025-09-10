@@ -2,15 +2,15 @@
 
 import json
 from pathlib import Path
-from typing import Any
 
 import click
+import genanki
 
 from .. import deck
 from ..image_utils import discover_images, map_content_by_image_filename
 from ..log import get_logger
 from ..processor import DeckProcessor
-from .schema import normalize_badge_data
+from .schema import MeritBadge, normalize_badge_data
 
 
 class MeritBadgeProcessor(DeckProcessor):
@@ -27,7 +27,7 @@ class MeritBadgeProcessor(DeckProcessor):
             "model_name": "Merit Badge Quiz",
         }
 
-    def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
+    def process_directory(self, directory_path: str) -> tuple[list[MeritBadge], dict[str, Path]]:
         """Process directory to find badges and images."""
         directory = Path(directory_path)
 
@@ -52,8 +52,8 @@ class MeritBadgeProcessor(DeckProcessor):
         return badges, available_images
 
     def map_content_to_images(
-        self, content: list[Any], images: dict[str, Any]
-    ) -> tuple[list[tuple[Any, str]], list[Any]]:
+        self, content: list[MeritBadge], images: dict[str, Path]
+    ) -> tuple[list[tuple[MeritBadge, str]], list[MeritBadge]]:
         """Map badges to images."""
         logger = get_logger()
         mapped_badges, unmapped_badges = map_content_by_image_filename(content, images)
@@ -66,11 +66,11 @@ class MeritBadgeProcessor(DeckProcessor):
 
     def create_mapping_summary(
         self,
-        content: list[Any],
-        images: dict[str, Any],
-        mapped: list[tuple[Any, str]],
-        unmapped: list[Any],
-    ) -> dict[str, Any]:
+        content: list[MeritBadge],
+        images: dict[str, Path],
+        mapped: list[tuple[MeritBadge, str]],
+        unmapped: list[MeritBadge],
+    ) -> dict[str, int | list[str]]:
         """Create mapping summary for badges."""
         mapped_image_names = {img_name for _, img_name in mapped}
         unused_images = set(images.keys()) - mapped_image_names
@@ -90,7 +90,7 @@ class MeritBadgeProcessor(DeckProcessor):
             "missing_image_details": missing_images,
         }
 
-    def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
+    def print_summary(self, summary: dict[str, int | list[str]], dry_run: bool) -> None:
         """Print merit badge summary."""
         click.echo("\n" + "=" * 60)
         click.echo("BUILD SUMMARY")
@@ -116,8 +116,8 @@ class MeritBadgeProcessor(DeckProcessor):
         self,
         deck_name: str,
         model_name: str,
-        mapped_content: list[tuple[Any, str]],
-        images: dict[str, Any],
-    ) -> tuple[Any, list[str]]:
+        mapped_content: list[tuple[MeritBadge, str]],
+        images: dict[str, Path],
+    ) -> tuple[genanki.Deck, list[str]]:
         """Create merit badge deck."""
         return deck.create_merit_badge_deck(deck_name, model_name, mapped_content, images)

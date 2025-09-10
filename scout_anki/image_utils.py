@@ -1,9 +1,15 @@
 """Shared image processing utilities."""
 
 from pathlib import Path
-from typing import Any
+from typing import Protocol
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+
+class ContentItem(Protocol):
+    """Protocol for content items that can be mapped to images."""
+
+    image_filename: str | None
 
 
 def discover_images(directory: Path) -> dict[str, Path]:
@@ -16,8 +22,8 @@ def discover_images(directory: Path) -> dict[str, Path]:
 
 
 def map_content_by_image_filename(
-    content: list[Any], images: dict[str, Any]
-) -> tuple[list[tuple[Any, str]], list[Any]]:
+    content: list[ContentItem], images: dict[str, Path]
+) -> tuple[list[tuple[ContentItem, str]], list[ContentItem]]:
     """Map content to images using image_filename field."""
     mapped = []
     unmapped = []
