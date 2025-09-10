@@ -5,6 +5,7 @@ __pycache__/
 venv
 .eggs
 .pytest_cache
+.ruff_cache
 *.egg-info
 .DS_Store
 

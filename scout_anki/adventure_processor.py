@@ -12,7 +12,7 @@ class AdventureProcessor(DeckProcessor):
     """Processor for Cub Scout adventure decks."""
 
     def __init__(self):
-        super().__init__("adventures")
+        super().__init__("cub-adventures")
 
     def get_defaults(self) -> dict[str, str]:
         """Get default values for adventures."""

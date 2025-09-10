@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from . import deck
+from .config import get_config
 from .errors import NoBadgesFoundError
 from .log import get_logger
 
@@ -15,6 +16,7 @@ class DeckProcessor(ABC):
     def __init__(self, deck_type: str):
         self.deck_type = deck_type
         self.logger = get_logger()
+        self.config = get_config()
 
     @abstractmethod
     def get_defaults(self) -> dict[str, str]:
@@ -69,14 +71,18 @@ class DeckProcessor(ABC):
         dry_run: bool = False,
     ) -> None:
         """Build deck with shared logic."""
-        # Set defaults
+        # Set defaults (config overrides built-in defaults)
         defaults = self.get_defaults()
         if not out:
-            out = defaults["out"]
+            out = self.config.get_deck_default(self.deck_type, "out", defaults["out"])
         if not deck_name:
-            deck_name = defaults["deck_name"]
+            deck_name = self.config.get_deck_default(
+                self.deck_type, "deck_name", defaults["deck_name"]
+            )
         if not model_name:
-            model_name = defaults["model_name"]
+            model_name = self.config.get_deck_default(
+                self.deck_type, "model_name", defaults["model_name"]
+            )
 
         # Process directory
         self.logger.info(f"Processing directory: {directory_path}")

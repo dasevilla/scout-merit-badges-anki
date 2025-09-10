@@ -12,7 +12,7 @@ class MeritBadgeProcessor(DeckProcessor):
     """Processor for merit badge decks."""
 
     def __init__(self):
-        super().__init__("badges")
+        super().__init__("merit-badges")
 
     def get_defaults(self) -> dict[str, str]:
         """Get default values for merit badges."""
