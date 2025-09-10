@@ -2,7 +2,7 @@
 
 ## Repository Overview
 
-This is a Python CLI tool that generates Anki flashcard decks (.apkg files) for Scouting content. Currently supports learning Scouting America merit badges by image. The tool processes local archive files (.zip, .tar.gz) containing merit badge data and images, maps badges to their corresponding images using sophisticated pattern matching, and creates structured Anki decks with stable IDs to prevent duplicates on reimport.
+This is a Python CLI tool that generates Anki flashcard decks (.apkg files) for Scouting content. Supports learning Scouting America merit badges and Cub Scout adventures by image. The tool processes local archive files (.tar.gz) containing badge/adventure data and images, maps content to images using direct `image_filename` field mapping, and creates structured Anki decks with stable IDs to prevent duplicates on reimport.
 
 **Repository Stats:**
 - Language: Python 3.11+ (currently using 3.12)
@@ -60,6 +60,12 @@ uv run pytest --cov-report=html && open htmlcov/index.html
 
 # Run CLI tool for testing
 uv run scout-anki --help
+
+# Build merit badge deck
+uv run scout-anki build merit-badges extracted/
+
+# Build cub adventure deck
+uv run scout-anki build cub-adventures extracted/
 ```
 
 ### Pre-commit Hooks (MANDATORY)
