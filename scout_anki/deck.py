@@ -8,7 +8,7 @@ import genanki
 
 from .cub_adventures.schema import Adventure
 from .log import get_logger
-from .merit_badges.schema import Badge
+from .merit_badges.schema import MeritBadge
 from .schema import slug, stable_id
 
 
@@ -98,7 +98,9 @@ def create_merit_badge_model(model_name: str) -> genanki.Model:
     )
 
 
-def create_merit_badge_note(badge: Badge, image_name: str, model: genanki.Model) -> genanki.Note:
+def create_merit_badge_note(
+    badge: MeritBadge, image_name: str, model: genanki.Model
+) -> genanki.Note:
     """Create an Anki note for a merit badge.
 
     Args:
@@ -128,7 +130,7 @@ def create_merit_badge_note(badge: Badge, image_name: str, model: genanki.Model)
 def create_merit_badge_deck(
     deck_name: str,
     model_name: str,
-    mapped_badges: list[tuple[Badge, str]],
+    mapped_badges: list[tuple[MeritBadge, str]],
     available_images: dict[str, Path],
 ) -> tuple[genanki.Deck, list[str]]:
     """Create an Anki deck with merit badge notes.

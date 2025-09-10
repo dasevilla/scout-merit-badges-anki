@@ -5,7 +5,7 @@ from typing import Any
 
 
 @dataclass
-class Badge:
+class MeritBadge:
     """Merit badge model."""
 
     name: str
@@ -16,16 +16,16 @@ class Badge:
     eagle_required: bool = False
 
 
-def normalize_badge_data(data: Any) -> list[Badge]:
-    """Normalize JSON data into Badge objects.
+def normalize_badge_data(data: Any) -> list[MeritBadge]:
+    """Normalize JSON data into MeritBadge objects.
 
     Args:
         data: Raw JSON data (list or dict)
 
     Returns:
-        List of normalized Badge objects
+        List of normalized MeritBadge objects
     """
-    badges: list[Badge] = []
+    badges: list[MeritBadge] = []
 
     # Extract badge list from various JSON structures
     if isinstance(data, list):
@@ -85,7 +85,7 @@ def normalize_badge_data(data: Any) -> list[Badge]:
         # Extract eagle required status
         eagle_required = bool(item.get("is_eagle_required", False))
 
-        badge = Badge(
+        badge = MeritBadge(
             name=name,
             description=description,
             image=image,
