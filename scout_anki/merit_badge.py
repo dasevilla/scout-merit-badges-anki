@@ -12,14 +12,14 @@ class MeritBadgeProcessor(DeckProcessor):
     """Processor for merit badge decks."""
 
     def __init__(self):
-        super().__init__("merit-badges")
+        super().__init__("badges")
 
     def get_defaults(self) -> dict[str, str]:
         """Get default values for merit badges."""
         return {
-            "out": "merit_badges_image_trainer.apkg",
-            "deck_name": "Merit Badges Visual Trainer",
-            "model_name": "Merit Badge Image → Text",
+            "out": "merit_badge_image_trainer.apkg",
+            "deck_name": "Merit Badge Image Trainer",
+            "model_name": "Merit Badge Quiz",
         }
 
     def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:

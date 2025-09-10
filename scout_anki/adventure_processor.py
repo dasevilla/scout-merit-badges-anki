@@ -12,14 +12,14 @@ class AdventureProcessor(DeckProcessor):
     """Processor for Cub Scout adventure decks."""
 
     def __init__(self):
-        super().__init__("cub-adventures")
+        super().__init__("adventures")
 
     def get_defaults(self) -> dict[str, str]:
         """Get default values for adventures."""
         return {
-            "out": "cub_adventures_image_trainer.apkg",
-            "deck_name": "Cub Scout Adventures",
-            "model_name": "Cub Scout Adventure Image → Text",
+            "out": "cub_scout_adventure_image_trainer.apkg",
+            "deck_name": "Cub Scout Adventure Image Trainer",
+            "model_name": "Cub Scout Adventure Quiz",
         }
 
     def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:

@@ -5,7 +5,6 @@ import sys
 import click
 
 from .adventure_processor import AdventureProcessor
-from .config import create_sample_config, save_sample_config
 from .errors import NoBadgesFoundError
 from .log import setup_logging
 from .merit_badge import MeritBadgeProcessor
@@ -69,20 +68,3 @@ def build(
 
             traceback.print_exc()
         sys.exit(1)
-
-
-@cli.command()
-@click.option("--show", is_flag=True, help="Show sample configuration")
-@click.option("--save", type=click.Path(), help="Save sample configuration to file")
-def config(show, save):
-    """Manage configuration."""
-    if show:
-        click.echo("Sample configuration:")
-        click.echo(create_sample_config())
-    elif save:
-        message = save_sample_config(save)
-        click.echo(message)
-    else:
-        # Default: save to current directory
-        message = save_sample_config()
-        click.echo(message)
