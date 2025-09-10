@@ -6,7 +6,7 @@ import click
 
 from .. import deck
 from ..processor import DeckProcessor
-from . import directory, mapping
+from . import data, mapping
 
 
 class MeritBadgeProcessor(DeckProcessor):
@@ -25,7 +25,7 @@ class MeritBadgeProcessor(DeckProcessor):
 
     def process_directory(self, directory_path: str) -> tuple[list[Any], dict[str, Any]]:
         """Process directory for merit badges."""
-        return directory.process_directory(directory_path)
+        return data.process_directory(directory_path)
 
     def map_content_to_images(
         self, content: list[Any], images: dict[str, Any]

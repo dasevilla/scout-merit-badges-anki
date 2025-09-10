@@ -6,7 +6,7 @@ import click
 
 from .. import deck
 from ..processor import DeckProcessor
-from . import adventure
+from . import adventure, mapping
 
 
 class AdventureProcessor(DeckProcessor):
@@ -31,7 +31,7 @@ class AdventureProcessor(DeckProcessor):
         self, content: list[Any], images: dict[str, Any]
     ) -> tuple[list[tuple[Any, str]], list[Any]]:
         """Map adventures to images."""
-        return adventure.map_adventures_to_images(content, images)
+        return mapping.map_adventures_to_images(content, images)
 
     def create_mapping_summary(
         self,
@@ -41,7 +41,7 @@ class AdventureProcessor(DeckProcessor):
         unmapped: list[Any],
     ) -> dict[str, Any]:
         """Create mapping summary for adventures."""
-        return adventure.create_adventure_mapping_summary(content, images, mapped, unmapped)
+        return mapping.create_adventure_mapping_summary(content, images, mapped, unmapped)
 
     def print_summary(self, summary: dict[str, Any], dry_run: bool) -> None:
         """Print adventure summary."""
