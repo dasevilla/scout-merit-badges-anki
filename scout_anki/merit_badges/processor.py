@@ -7,6 +7,7 @@ from typing import Any
 import click
 
 from .. import deck
+from ..image_utils import discover_images, map_content_by_image_filename
 from ..log import get_logger
 from ..processor import DeckProcessor
 from .schema import normalize_badge_data
@@ -46,12 +47,7 @@ class MeritBadgeProcessor(DeckProcessor):
         badges = normalize_badge_data(all_badge_data)
 
         # Find image files
-        available_images = {}
-        image_extensions = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
-
-        for img_file in directory.glob("**/*"):
-            if img_file.is_file() and img_file.suffix.lower() in image_extensions:
-                available_images[img_file.name] = img_file
+        available_images = discover_images(directory)
 
         return badges, available_images
 
@@ -60,20 +56,7 @@ class MeritBadgeProcessor(DeckProcessor):
     ) -> tuple[list[tuple[Any, str]], list[Any]]:
         """Map badges to images."""
         logger = get_logger()
-        mapped_badges = []
-        unmapped_badges = []
-
-        for badge in content:
-            # Use the image_filename field directly
-            image_name = None
-            if hasattr(badge, "image_filename") and badge.image_filename:
-                if badge.image_filename in images:
-                    image_name = badge.image_filename
-
-            if image_name:
-                mapped_badges.append((badge, image_name))
-            else:
-                unmapped_badges.append(badge)
+        mapped_badges, unmapped_badges = map_content_by_image_filename(content, images)
 
         logger.info(
             f"Mapped {len(mapped_badges)} badges to images, "

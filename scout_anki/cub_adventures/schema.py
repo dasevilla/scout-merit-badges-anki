@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..image_utils import discover_images
 from ..log import get_logger
 
 
@@ -75,10 +76,9 @@ def process_adventure_directory(directory_path: str) -> tuple[list[Adventure], d
         # Process images
         images_dir = rank_path / "images"
         if images_dir.exists():
-            for image_file in images_dir.glob("*"):
-                if image_file.suffix.lower() in {".jpg", ".jpeg", ".png", ".gif"}:
-                    available_images[image_file.name] = image_file
-                    logger.debug(f"Found image: {image_file.name}")
+            rank_images = discover_images(images_dir)
+            available_images.update(rank_images)
+            logger.debug(f"Found {len(rank_images)} images in {images_dir}")
 
     logger.info(f"Found {len(adventures)} adventures and {len(available_images)} images")
     return adventures, available_images

@@ -5,6 +5,7 @@ from typing import Any
 import click
 
 from .. import deck
+from ..image_utils import map_content_by_image_filename
 from ..log import get_logger
 from ..processor import DeckProcessor
 from .schema import process_adventure_directory
@@ -33,20 +34,7 @@ class AdventureProcessor(DeckProcessor):
     ) -> tuple[list[tuple[Any, str]], list[Any]]:
         """Map adventures to images."""
         logger = get_logger()
-        mapped_adventures = []
-        unmapped_adventures = []
-
-        for adventure in content:
-            # Use the image_filename field directly
-            image_name = None
-            if hasattr(adventure, "image_filename") and adventure.image_filename:
-                if adventure.image_filename in images:
-                    image_name = adventure.image_filename
-
-            if image_name:
-                mapped_adventures.append((adventure, image_name))
-            else:
-                unmapped_adventures.append(adventure)
+        mapped_adventures, unmapped_adventures = map_content_by_image_filename(content, images)
 
         logger.info(
             f"Mapped {len(mapped_adventures)} adventures to images, "
