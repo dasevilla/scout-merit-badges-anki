@@ -4,8 +4,9 @@ from typing import Any
 
 import click
 
-from . import deck, directory, mapping
-from .processor import DeckProcessor
+from .. import deck
+from ..processor import DeckProcessor
+from . import directory, mapping
 
 
 class MeritBadgeProcessor(DeckProcessor):

@@ -4,8 +4,9 @@ from typing import Any
 
 import click
 
-from . import adventure, deck
-from .processor import DeckProcessor
+from .. import deck
+from ..processor import DeckProcessor
+from . import adventure
 
 
 class AdventureProcessor(DeckProcessor):

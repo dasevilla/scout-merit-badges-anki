@@ -6,7 +6,7 @@ from pathlib import Path
 
 import genanki
 
-from .adventure import Adventure
+from .cub_adventures.adventure import Adventure
 from .log import get_logger
 from .schema import Badge, slug, stable_id
 

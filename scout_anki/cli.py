@@ -4,10 +4,10 @@ import sys
 
 import click
 
-from .adventure_processor import AdventureProcessor
+from .cub_adventures.processor import AdventureProcessor
 from .errors import NoBadgesFoundError
 from .log import setup_logging
-from .merit_badge import MeritBadgeProcessor
+from .merit_badges.processor import MeritBadgeProcessor
 
 
 @click.group()

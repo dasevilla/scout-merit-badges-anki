@@ -5,8 +5,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from .log import get_logger
-from .schema import Badge, slug
+from ..log import get_logger
+from ..schema import Badge, slug
 
 
 @lru_cache(maxsize=128)

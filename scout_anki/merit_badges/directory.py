@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from . import schema
+from .. import schema
 
 
 def process_directory(directory_path):

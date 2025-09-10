@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from .log import get_logger
+from ..log import get_logger
 
 
 @dataclass
