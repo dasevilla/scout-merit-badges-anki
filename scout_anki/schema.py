@@ -13,6 +13,7 @@ class Badge:
     name: str
     description: str
     image: str | None = None
+    image_filename: str | None = None
     source: str | None = None
     eagle_required: bool = False
 
@@ -126,6 +127,11 @@ def normalize_badge_data(data: Any) -> list[Badge]:
                 image = str(item[img_key]).strip()
                 break
 
+        # Extract image filename
+        image_filename = None
+        if item.get("image_filename"):
+            image_filename = str(item["image_filename"]).strip()
+
         # Extract eagle required status
         eagle_required = bool(item.get("is_eagle_required", False))
 
@@ -133,6 +139,7 @@ def normalize_badge_data(data: Any) -> list[Badge]:
             name=name,
             description=description,
             image=image,
+            image_filename=image_filename,
             source="JSON",
             eagle_required=eagle_required,
         )

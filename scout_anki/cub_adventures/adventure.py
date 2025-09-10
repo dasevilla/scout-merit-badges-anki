@@ -15,7 +15,7 @@ class Adventure:
     rank: str
     type: str  # Required/Elective
     overview: str
-    image_name: str | None = None
+    image_filename: str | None = None
 
     @property
     def slug(self) -> str:
@@ -35,6 +35,7 @@ def normalize_adventure_data(data: dict) -> Adventure:
         rank=data.get("rank_name", ""),
         type=data.get("adventure_type", ""),
         overview=data.get("adventure_overview", ""),
+        image_filename=data.get("image_filename"),
     )
 
 

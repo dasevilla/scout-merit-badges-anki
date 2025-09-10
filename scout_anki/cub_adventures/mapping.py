@@ -31,20 +31,11 @@ def map_adventures_to_images(
 
 
 def find_adventure_image(adventure: Adventure, available_images: dict[str, Path]) -> str | None:
-    """Find the best matching image for an adventure."""
-    # Try exact slug match first
-    slug = adventure.slug
-    for image_name in available_images:
-        image_base = Path(image_name).stem.lower()
-        if image_base == slug:
-            return image_name
-
-    # Try partial matches
-    for image_name in available_images:
-        image_base = Path(image_name).stem.lower()
-        if slug in image_base or image_base in slug:
-            return image_name
-
+    """Find the image for an adventure using the image_filename field."""
+    # Use the image_filename field directly
+    if hasattr(adventure, "image_filename") and adventure.image_filename:
+        if adventure.image_filename in available_images:
+            return adventure.image_filename
     return None
 
 
@@ -60,10 +51,11 @@ def create_adventure_mapping_summary(
 
     missing_image_details = []
     for adventure in unmapped_adventures:
+        expected = getattr(adventure, "image_filename", f"{adventure.slug}.jpg")
         missing_image_details.append(
             {
                 "adventure_name": f"{adventure.name} ({adventure.rank})",
-                "expected_image": f"{adventure.slug}.jpg",
+                "expected_image": expected,
             }
         )
 
