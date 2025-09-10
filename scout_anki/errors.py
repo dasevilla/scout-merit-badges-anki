@@ -13,6 +13,12 @@ class NoBadgesFoundError(ScoutAnkiError):
     pass
 
 
+class NoImagesFoundError(ScoutAnkiError):
+    """No images found in directory."""
+
+    pass
+
+
 class ValidationError(ScoutAnkiError):
     """Validation failed with missing images."""
 

@@ -5,7 +5,7 @@ import sys
 import click
 
 from .cub_adventures.processor import AdventureProcessor
-from .errors import NoBadgesFoundError
+from .errors import NoBadgesFoundError, NoImagesFoundError
 from .log import setup_logging
 from .merit_badges.processor import MeritBadgeProcessor
 
@@ -54,10 +54,9 @@ def build(
         # Build deck using processor
         processor.build_deck(directory_path, out, deck_name, model_name, dry_run)
 
-    except ValueError as e:
-        if "No images found" in str(e):
-            logger.error(str(e))
-            sys.exit(3)
+    except NoImagesFoundError as e:
+        logger.error(str(e))
+        sys.exit(3)
     except NoBadgesFoundError as e:
         logger.error(str(e))
         sys.exit(4)

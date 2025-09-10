@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from . import deck
-from .errors import NoBadgesFoundError
+from .errors import NoBadgesFoundError, NoImagesFoundError
 from .log import get_logger
 
 
@@ -86,7 +86,7 @@ class DeckProcessor(ABC):
             raise NoBadgesFoundError(f"No {self.deck_type} found in directory")
 
         if not available_images:
-            raise ValueError("No images found in directory")
+            raise NoImagesFoundError("No images found in directory")
 
         # Map content to images
         self.logger.info(f"Mapping {self.deck_type} to images...")
