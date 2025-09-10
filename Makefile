@@ -47,7 +47,7 @@ extract-archives:
 	for file in *.tar.gz; do [ -f "$$file" ] && tar -xzf "$$file" -C extracted/ || true; done
 
 build-deck:
-	uv run scout-anki build extracted/
+	uv run scout-anki build merit-badges extracted/
 
 fetch-and-build: fetch-releases extract-archives build-deck
 

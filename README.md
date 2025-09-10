@@ -26,21 +26,24 @@ mkdir -p extracted/
 for file in *.zip; do unzip -q "$file" -d extracted/; done
 for file in *.tar.gz; do tar -xzf "$file" -C extracted/; done
 
-# Generate Anki deck from extracted directory
-scout-anki build extracted/
+# Generate merit badge Anki deck from extracted directory
+scout-anki build merit-badges extracted/
 ```
 
 ### Advanced Usage
 
 ```bash
-# Custom output file
-scout-anki build extracted/ --out my_badges.apkg
+# Merit badges with custom output file
+scout-anki build merit-badges extracted/ --out my_badges.apkg
 
 # Dry run to preview without creating file
-scout-anki build extracted/ --dry-run
+scout-anki build merit-badges extracted/ --dry-run
+
+# Cub Scout adventures (coming soon)
+scout-anki build cub-adventures extracted/
 
 # Custom deck and model names
-scout-anki build extracted/ --deck-name "My Badges" --model-name "Badge Quiz"
+scout-anki build merit-badges extracted/ --deck-name "My Badges" --model-name "Badge Quiz"
 ```
 
 ### Command Reference
@@ -48,31 +51,32 @@ scout-anki build extracted/ --deck-name "My Badges" --model-name "Badge Quiz"
 #### `build` - Generate Anki deck
 
 ```bash
-scout-anki build [DIRECTORY] [OPTIONS]
+scout-anki build DECK_TYPE DIRECTORY [OPTIONS]
 ```
 
 **Arguments:**
+- `DECK_TYPE` - Type of deck to build: `merit-badges` or `cub-adventures`
 - `DIRECTORY` - Directory containing extracted badge data and images
 
 **Options:**
-- `--out PATH` - Output file path (default: `merit_badges_image_trainer.apkg`)
-- `--deck-name TEXT` - Anki deck name (default: `Merit Badges Image Trainer`)
-- `--model-name TEXT` - Anki model name (default: `Merit Badge Image → Text`)
+- `--out PATH` - Output file path (auto-generated based on deck type if not specified)
+- `--deck-name TEXT` - Anki deck name (auto-generated based on deck type if not specified)
+- `--model-name TEXT` - Anki model name (auto-generated based on deck type if not specified)
 - `--dry-run` - Preview without creating .apkg file
 - `-q, --quiet` - Only show errors
 - `-v, --verbose` - Increase verbosity
 
 ## How It Works
 
-1. **Reads local archive files** (.zip, .tar.gz) containing badge data and images
-2. **Extracts badge data** from JSON files using flexible schema normalization
-3. **Maps badges to images** using explicit filenames or smart pattern matching
+1. **Reads local archive files** (.zip, .tar.gz) containing Scouting data and images
+2. **Extracts content data** from JSON files using flexible schema normalization
+3. **Maps content to images** using explicit filenames or smart pattern matching
 4. **Creates Anki deck** with stable IDs to prevent duplicates on reimport
 5. **Bundles media files** into a complete .apkg package
 
 ### Image Mapping Strategy
 
-The tool uses a sophisticated strategy to match badges with images:
+The tool uses a sophisticated strategy to match content with images:
 
 1. **Explicit mapping**: If JSON specifies an image filename, match by basename
 2. **Pattern matching**: Look for `<badge-slug>-merit-badge.*` format

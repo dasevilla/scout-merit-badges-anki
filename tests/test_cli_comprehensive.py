@@ -21,7 +21,7 @@ def test_build_with_valid_directory():
                     mock_deck.return_value = (Mock(), [])
 
                     runner = CliRunner()
-                    result = runner.invoke(build, [temp_dir, "--dry-run"])
+                    result = runner.invoke(build, ["merit-badges", temp_dir, "--dry-run"])
 
                     assert result.exit_code == 0
 
@@ -33,6 +33,6 @@ def test_build_no_badges_found():
             mock_process.return_value = ([], {})
 
             runner = CliRunner()
-            result = runner.invoke(build, [temp_dir])
+            result = runner.invoke(build, ["merit-badges", temp_dir])
 
             assert result.exit_code == 4  # NoBadgesFoundError exit code

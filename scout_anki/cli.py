@@ -18,19 +18,20 @@ def cli():
 
 
 @cli.command()
+@click.argument("deck_type", type=click.Choice(["merit-badges", "cub-adventures"]))
 @click.argument("directory_path", type=click.Path(exists=True, file_okay=False, readable=True))
 @click.option(
     "--out",
     type=click.Path(writable=True),
-    default="merit_badges_image_trainer.apkg",
-    help="Output file path",
+    help="Output file path (default: auto-generated based on deck type)",
 )
-@click.option("--deck-name", default="Merit Badges Visual Trainer", help="Anki deck name")
-@click.option("--model-name", default="Merit Badge Image → Text", help="Anki model name")
+@click.option("--deck-name", help="Anki deck name (default: auto-generated based on deck type)")
+@click.option("--model-name", help="Anki model name (default: auto-generated based on deck type)")
 @click.option("--dry-run", is_flag=True, default=False, help="Run without writing .apkg file")
 @click.option("-q", "--quiet", is_flag=True, help="Only show errors")
 @click.option("-v", "--verbose", count=True, help="Increase verbosity")
 def build(
+    deck_type,
     directory_path,
     out,
     deck_name,
@@ -45,52 +46,10 @@ def build(
     logger = setup_logging(quiet=quiet, verbose=verbose)
 
     try:
-        # Process directory
-        logger.info(f"Processing directory: {directory_path}")
-        badges, available_images = directory.process_directory(directory_path)
-
-        if not badges:
-            raise NoBadgesFoundError("No badges found in directory")
-
-        if not available_images:
-            raise ValueError("No images found in directory")
-
-        # Map badges to images
-        logger.info("Mapping badges to images...")
-        mapped_badges, unmapped_badges = mapping.map_badges_to_images(badges, available_images)
-
-        # Create mapping summary
-        summary = mapping.create_mapping_summary(
-            badges, available_images, mapped_badges, unmapped_badges
-        )
-
-        # Print summary
-        print_build_summary(summary, dry_run)
-
-        if not mapped_badges:
-            logger.error("No badges could be mapped to images")
-            sys.exit(4)
-
-        # Build deck (unless dry run)
-        if not dry_run:
-            logger.info("Building Anki deck...")
-            anki_deck, media_files = deck.create_merit_badge_deck(
-                deck_name=deck_name,
-                model_name=model_name,
-                mapped_badges=mapped_badges,
-                available_images=available_images,
-            )
-
-            # Write package
-            logger.info(f"Writing package to {out}")
-            deck.write_anki_package(anki_deck, media_files, out)
-
-            # Cleanup temp files
-            deck.cleanup_temp_files(media_files)
-
-            logger.info(f"Successfully created {out}")
-        else:
-            logger.info("Dry run complete - no .apkg file written")
+        if deck_type == "merit-badges":
+            build_merit_badge_deck(directory_path, out, deck_name, model_name, dry_run, logger)
+        elif deck_type == "cub-adventures":
+            build_cub_adventure_deck(directory_path, out, deck_name, model_name, dry_run, logger)
 
     except ValueError as e:
         if "No images found" in str(e):
@@ -106,6 +65,78 @@ def build(
 
             traceback.print_exc()
         sys.exit(1)
+
+
+def build_merit_badge_deck(directory_path, out, deck_name, model_name, dry_run, logger):
+    """Build merit badge deck (existing functionality)."""
+    # Set defaults for merit badges
+    if not out:
+        out = "merit_badges_image_trainer.apkg"
+    if not deck_name:
+        deck_name = "Merit Badges Visual Trainer"
+    if not model_name:
+        model_name = "Merit Badge Image → Text"
+
+    # Process directory
+    logger.info(f"Processing directory: {directory_path}")
+    badges, available_images = directory.process_directory(directory_path)
+
+    if not badges:
+        raise NoBadgesFoundError("No badges found in directory")
+
+    if not available_images:
+        raise ValueError("No images found in directory")
+
+    # Map badges to images
+    logger.info("Mapping badges to images...")
+    mapped_badges, unmapped_badges = mapping.map_badges_to_images(badges, available_images)
+
+    # Create mapping summary
+    summary = mapping.create_mapping_summary(
+        badges, available_images, mapped_badges, unmapped_badges
+    )
+
+    # Print summary
+    print_build_summary(summary, dry_run)
+
+    if not mapped_badges:
+        logger.error("No badges could be mapped to images")
+        sys.exit(4)
+
+    # Build deck (unless dry run)
+    if not dry_run:
+        logger.info("Building Anki deck...")
+        anki_deck, media_files = deck.create_merit_badge_deck(
+            deck_name=deck_name,
+            model_name=model_name,
+            mapped_badges=mapped_badges,
+            available_images=available_images,
+        )
+
+        # Write package
+        logger.info(f"Writing package to {out}")
+        deck.write_anki_package(anki_deck, media_files, out)
+
+        # Cleanup temp files
+        deck.cleanup_temp_files(media_files)
+
+        logger.info(f"Successfully created {out}")
+    else:
+        logger.info("Dry run complete - no .apkg file written")
+
+
+def build_cub_adventure_deck(directory_path, out, deck_name, model_name, dry_run, logger):
+    """Build Cub Scout adventure deck (placeholder for Phase 3)."""
+    # Set defaults for adventures
+    if not out:
+        out = "cub_adventures_image_trainer.apkg"
+    if not deck_name:
+        deck_name = "Cub Scout Adventures"
+    if not model_name:
+        model_name = "Cub Scout Adventure Image → Text"
+
+    logger.error("Cub Scout adventures not yet implemented - coming in Phase 3!")
+    sys.exit(1)
 
 
 def print_build_summary(summary: dict, dry_run: bool = False) -> None:
