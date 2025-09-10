@@ -6,6 +6,7 @@ from pathlib import Path
 
 import genanki
 
+from .adventure import Adventure
 from .log import get_logger
 from .schema import Badge, slug, stable_id
 
@@ -214,3 +215,127 @@ def cleanup_temp_files(media_files: list[str]) -> None:
             os.rmdir(temp_dir)
         except OSError:
             pass  # Directory not empty or other error, ignore
+
+
+def create_adventure_model(model_name: str) -> genanki.Model:
+    """Create the Anki model for adventure cards."""
+    model_id = stable_id(model_name)
+
+    fields = [
+        {"name": "Image"},
+        {"name": "Name"},
+        {"name": "Rank"},
+        {"name": "Type"},
+        {"name": "Overview"},
+    ]
+
+    templates = [
+        {
+            "name": "Adventure Card",
+            "qfmt": """
+                <div style="text-align: center; font-family: Arial, sans-serif;">
+                    {{Image}}
+                </div>
+            """,
+            "afmt": """
+                <div style="text-align: center; font-family: Arial, sans-serif;">
+                    {{Image}}
+                    <hr>
+                    <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">
+                        {{Name}}
+                    </div>
+                    <div style="font-size: 18px; color: #666; margin: 5px 0;">
+                        {{Rank}} • {{Type}}
+                    </div>
+                    <div style="font-size: 14px; margin: 15px 0; text-align: left;
+                                max-width: 600px; margin-left: auto; margin-right: auto;">
+                        {{Overview}}
+                    </div>
+                </div>
+            """,
+        }
+    ]
+
+    css = """
+        .card {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            text-align: center;
+            color: black;
+            background-color: white;
+        }
+        img {
+            max-width: 85%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+    """
+
+    return genanki.Model(
+        model_id=model_id,
+        name=model_name,
+        fields=fields,
+        templates=templates,
+        css=css,
+    )
+
+
+def create_adventure_deck(
+    deck_name: str,
+    model_name: str,
+    mapped_adventures: list[tuple[Adventure, str]],
+    available_images: dict[str, Path],
+) -> tuple[genanki.Deck, list[str]]:
+    """Create Anki deck for Cub Scout adventures."""
+    logger = get_logger()
+
+    # Create model and deck
+    model = create_adventure_model(model_name)
+    deck_id = stable_id(deck_name)
+    deck = genanki.Deck(deck_id=deck_id, name=deck_name)
+
+    # Create temporary directory for media files
+    temp_dir = tempfile.mkdtemp()
+    media_files = []
+
+    for adventure, image_name in mapped_adventures:
+        # Copy image to temp directory
+        source_path = available_images[image_name]
+        temp_image_path = os.path.join(temp_dir, image_name)
+
+        try:
+            import shutil
+
+            shutil.copy2(source_path, temp_image_path)
+            media_files.append(temp_image_path)
+        except Exception as e:
+            logger.warning(f"Failed to copy image {image_name}: {e}")
+            continue
+
+        # Create note
+        note_id = adventure.stable_id
+
+        # Truncate overview if too long
+        overview = adventure.overview
+        if len(overview) > 500:
+            overview = overview[:497] + "..."
+
+        fields = [
+            f'<img src="{image_name}" style="max-width: 85%; height: auto;">',
+            adventure.name,
+            adventure.rank,
+            adventure.type,
+            overview,
+        ]
+
+        note = genanki.Note(
+            model=model,
+            fields=fields,
+            guid=str(note_id),
+        )
+
+        deck.add_note(note)
+
+    logger.info(f"Created deck '{deck_name}' with {len(deck.notes)} notes")
+    return deck, media_files
