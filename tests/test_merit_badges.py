@@ -54,8 +54,8 @@ def test_merit_badge_defaults():
     processor = MeritBadgeProcessor()
     defaults = processor.get_defaults()
 
-    assert defaults["out"] == "merit_badges.apkg"
-    assert defaults["deck_name"] == "Merit Badges"
+    assert defaults["out"] == "merit_badges_image_trainer.apkg"
+    assert defaults["deck_name"] == "Merit Badges Image Trainer"
     assert defaults["model_name"] == "Merit Badge Quiz"
 
 
