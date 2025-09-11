@@ -22,8 +22,8 @@ class MeritBadgeProcessor(DeckProcessor):
     def get_defaults(self) -> dict[str, str]:
         """Get default values for merit badges."""
         return {
-            "out": "merit_badges.apkg",
-            "deck_name": "Merit Badges",
+            "out": "merit_badges_image_trainer.apkg",
+            "deck_name": "Merit Badges Image Trainer",
             "model_name": "Merit Badge Quiz",
         }
 
