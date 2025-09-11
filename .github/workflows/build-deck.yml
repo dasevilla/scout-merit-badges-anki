@@ -69,9 +69,10 @@ jobs:
       if: steps.check-release.outputs.should-build == 'true'
       run: uv sync
 
-    - name: Build Anki deck
+    - name: Build Anki decks
       if: steps.check-release.outputs.should-build == 'true'
-      run: make fetch-and-build
+      run: |
+        make fetch-releases extract-archives build-all
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,11 +82,11 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        DECK_FILE=$(ls *.apkg | head -1)
-        echo "deck-file=$DECK_FILE" >> $GITHUB_OUTPUT
+        DECK_FILES=$(ls *.apkg | tr '\n' ' ')
+        echo "deck-files=$DECK_FILES" >> $GITHUB_OUTPUT
 
-        DECK_SIZE=$(du -h "$DECK_FILE" | cut -f1)
-        echo "deck-size=$DECK_SIZE" >> $GITHUB_OUTPUT
+        TOTAL_SIZE=$(du -ch *.apkg | tail -1 | cut -f1)
+        echo "total-size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
 
         SCOUT_TAG=$(gh release list --repo dasevilla/scout-archive --limit 1 --json tagName --jq '.[0].tagName')
         echo "scout-tag=$SCOUT_TAG" >> $GITHUB_OUTPUT
@@ -101,9 +102,9 @@ jobs:
           RELEASE_NAME="${{ inputs.release_name }}"
         else
           if [ "$GITHUB_RUN_ATTEMPT" = "1" ]; then
-            RELEASE_NAME="Merit Badge Deck - $DATE (Build $GITHUB_RUN_NUMBER)"
+            RELEASE_NAME="Scout Anki Decks - $DATE (Build $GITHUB_RUN_NUMBER)"
           else
-            RELEASE_NAME="Merit Badge Deck - $DATE (Build $GITHUB_RUN_NUMBER, Attempt $GITHUB_RUN_ATTEMPT)"
+            RELEASE_NAME="Scout Anki Decks - $DATE (Build $GITHUB_RUN_NUMBER, Attempt $GITHUB_RUN_ATTEMPT)"
           fi
         fi
         echo "release-name=$RELEASE_NAME" >> $GITHUB_OUTPUT
@@ -122,29 +123,29 @@ jobs:
         tag_name: ${{ steps.deck-info.outputs.release-tag }}
         name: ${{ steps.deck-info.outputs.release-name }}
         body: |
-          ## Merit Badge Anki Deck
+          ## Scout Anki Decks
 
-          This release contains an Anki deck for learning Scouting America merit badges by image.
+          This release contains Anki decks for learning Scouting America content by image.
 
           ### Details
-          - **Deck file**: `${{ steps.deck-info.outputs.deck-file }}`
-          - **File size**: ${{ steps.deck-info.outputs.deck-size }}
+          - **Deck files**: ${{ steps.deck-info.outputs.deck-files }}
+          - **Total size**: ${{ steps.deck-info.outputs.total-size }}
           - **Source data**: [scout-archive/${{ steps.deck-info.outputs.scout-tag }}](https://github.com/dasevilla/scout-archive/releases/tag/${{ steps.deck-info.outputs.scout-tag }})
           - **Generated**: ${{ steps.deck-info.outputs.generated-date }}
 
           ### How to Use
-          1. Download the `.apkg` file below
+          1. Download the `.apkg` file(s) below
           2. Open Anki on your device
           3. Go to File → Import
           4. Select the downloaded `.apkg` file
           5. The deck will be imported and ready to study!
 
           ### What's Included
-          - Merit badge images on the front of cards
-          - Badge names and descriptions on the back
+          - **Merit Badges**: Badge images with names, descriptions, and Eagle required indicators
+          - **Cub Adventures**: Adventure loop images with names, ranks, types, and descriptions
           - Stable card IDs to prevent duplicates when reimporting
 
-          Generated automatically from the [scout-merit-badges-anki](https://github.com/dasevilla/scout-merit-badges-anki) project.
+          Generated automatically from the [scout-anki](https://github.com/dasevilla/scout-anki) project.
         files: |
           *.apkg
         draft: false
